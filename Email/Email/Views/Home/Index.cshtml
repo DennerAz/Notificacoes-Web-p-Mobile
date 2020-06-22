@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enviando Mensagem</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <!-- Formulário-->
+    <form id="Form">
+        <div class="form-group">
+            <label>Título</label>
+            <input type="text" class="form-control" id="titulo">
+        </div>
+        <div class="form-group">
+            <label>Mensagem</label>
+            <input class="form-control" type="text" id="mensagem">
+        </div>
+        <input type="button" class="btn btn-primary" onclick="Enviar()" value="Enviar">
+    </form>
+
+
+
+    <!--Javascript-->
+    <!--Importações Firebase e outros-->
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-firestore.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+        var peloamordedeus;
+        // Configuração do Firebase
+        const Configuracao = {
+            apiKey: "AIzaSyBo8vMQdWAtFagrSyK1Ok904haWmIbwf7c",
+            authDomain: "teste-web-7e9dc.firebaseapp.com",
+            databaseURL: "https://teste-web-7e9dc.firebaseio.com",
+            projectId: "teste-web-7e9dc",
+            storageBucket: "teste-web-7e9dc.appspot.com",
+            messagingSenderId: "107574881124",
+            appId: "1:107574881124:web:6b68c547beeb19ef1ee871",
+            measurementId: "G-NM0EFBW5VV"
+        };
+      
+        firebase.initializeApp(Configuracao);
+        var db = firebase.firestore();
+        var ListaToken = [];
+       function Enviar() {
+            //document.getElementById("Form").submit();
+           db.collection("Dispositivos").where('Cidade', '==', 'Alfenas').get().then(function (querySnapshot) {
+               querySnapshot.forEach(function (doc) {
+                    ListaToken.push(doc.get('Token'));
+                });
+               EnviaMensagem(document.getElementById("titulo").value,
+                    document.getElementById("mensagem").value,
+                   ListaToken);
+           });
+           ListaToken = []; 
+        }
+
+        function EnviaMensagem(title, msg, token) {
+            const mensagem = {
+                Titulo: title,
+                Texto: msg,
+                Token: token
+            };           
+            console.log(mensagem);
+            axios.post("http://127.0.0.1:3000/home", mensagem)
+                .then(() => console.log("Executando o Post"))
+                .catch((err) => console.log(err)) 
+      
+        }
+    </script>
+
+</body>
+</html>
